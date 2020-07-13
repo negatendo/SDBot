@@ -30,10 +30,10 @@ class WebHookPayload {
 	public String content;
 	public String avatar_url;
 
-	public WebHookPayload(String name, String id, String message) {
+	public WebHookPayload(String name, String id, String message, String prefix) {
 		this.username = name;
 		this.avatar_url = "https://crafatar.com/renders/head/" + id + "?overlay";
-		this.content = escapeMarkdown(message);
+		this.content = prefix + " " + escapeMarkdown(message);
 	}
 
 	private String escapeMarkdown(String str) {
@@ -92,15 +92,6 @@ public class Source extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 	}
 
-
-	/*
-	* TODO
-	*
-	* - format messages escaping markdown with java
-	* - add advancement announcement https://jd.bukkit.org/org/bukkit/event/player/PlayerAchievementAwardedEvent.html
-	*
-	* */
-
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
@@ -126,7 +117,7 @@ public class Source extends JavaPlugin implements Listener {
 				// we trim off the minecraft color formatting for this event
 				String originalMessage = event.getJoinMessage().substring(2);
 				// setup object
-				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage );
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage, ":green_circle:" );
 				// get string from payload
 				ObjectMapper myObjectMapper = new ObjectMapper();
 				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
@@ -177,7 +168,7 @@ public class Source extends JavaPlugin implements Listener {
 				// we trim off the minecraft color formatting for this event
 				String originalMessage = event.getQuitMessage().substring(2);
 				// setup object
-				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage );
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage, ":red_circle:" );
 				// get string from payload
 				ObjectMapper myObjectMapper = new ObjectMapper();
 				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
@@ -225,10 +216,8 @@ public class Source extends JavaPlugin implements Listener {
 
 				Charset charset = StandardCharsets.UTF_8;
 
-				// escapes any special markdown characters
-				String originalMessage = event.getDeathMessage();
 				// setup object
-				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage );
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), event.getDeathMessage(), ":skull_crossbones:" );
 				// get string from payload
 				ObjectMapper myObjectMapper = new ObjectMapper();
 				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
@@ -277,7 +266,7 @@ public class Source extends JavaPlugin implements Listener {
 				Charset charset = StandardCharsets.UTF_8;
 
 				// setup object
-				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), event.getMessage() );
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), event.getMessage(), ":speech_balloon:" );
 				// get string from payload
 				ObjectMapper myObjectMapper = new ObjectMapper();
 				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
