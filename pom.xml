@@ -56,4 +56,13 @@
 
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub negatendo Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/negatendo/SDBot</url>
+        </repository>
+    </distributionManagement>
+
+
 </project>
