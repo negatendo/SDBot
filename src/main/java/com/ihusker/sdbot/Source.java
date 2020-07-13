@@ -65,12 +65,12 @@ public class Source extends JavaPlugin implements Listener {
 				connection.setDoOutput(true);
 
 				Charset charset = StandardCharsets.UTF_8;
+				// trim off text formatting garbage
+				String eventString = event.getQuitMessage().substring(2);
 				try (OutputStream outputStream = connection.getOutputStream()) {
-					// trim off text formatting garbage
-					String eventString = event.getQuitMessage().substring(2);
 					byte[] input = (
 							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + "_" + eventString + "_" +
+									"\",\"content\":\"" + ":peace: _```" + eventString + "```_" +
 									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
 					).getBytes(charset);
 					outputStream.write(input, 0, input.length);
@@ -113,12 +113,12 @@ public class Source extends JavaPlugin implements Listener {
 				connection.setDoOutput(true);
 
 				Charset charset = StandardCharsets.UTF_8;
+				// trim off text formatting garbage
+				String eventString = event.getJoinMessage().substring(2);
 				try (OutputStream outputStream = connection.getOutputStream()) {
-					// trim off text formatting garbage
-					String eventString = event.getJoinMessage().substring(2);
 					byte[] input = (
 							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + "_" + eventString + "_" +
+									"\",\"content\":\"" + ":wave: _```" + eventString + "```_" +
 									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
 					).getBytes(charset);
 					outputStream.write(input, 0, input.length);
@@ -164,7 +164,7 @@ public class Source extends JavaPlugin implements Listener {
 				try (OutputStream outputStream = connection.getOutputStream()) {
 					byte[] input = (
 							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + "_" + event.getDeathMessage() + "_" +
+									"\",\"content\":\"" + ":skull_crossbones: _```" + event.getDeathMessage() + "```_" +
 									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
 					).getBytes(charset);
 					outputStream.write(input, 0, input.length);
@@ -210,7 +210,7 @@ public class Source extends JavaPlugin implements Listener {
 				try (OutputStream outputStream = connection.getOutputStream()) {
 					byte[] input = (
 							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + event.getMessage() +
+									"\",\"content\":\"" + ":speech_left: ```" + event.getMessage() + "```" +
 									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
 					).getBytes(charset);
 					outputStream.write(input, 0, input.length);
