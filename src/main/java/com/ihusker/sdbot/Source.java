@@ -1,5 +1,7 @@
 package com.ihusker.sdbot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +23,52 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+class WebHookPayload {
+
+	public String username;
+	public String content;
+	public String avatar_url;
+
+	public WebHookPayload(String name, String id, String message) {
+		this.username = name;
+		this.avatar_url = "https://crafatar.com/renders/head/" + id + "?overlay";
+		this.content = escapeMarkdown(message);
+	}
+
+	private String escapeMarkdown(String str) {
+		//escapes anything that might be interpreted as markdown by discord
+		String returnStr = str;
+		String[] markdownSpecialChars = new String[] {
+				"\\",
+				"\b",
+				"\f",
+				"\n",
+				"\t",
+				"\"",
+				"`",
+				"*",
+				"_",
+				"{",
+				"}",
+				"[",
+				"]",
+				"(",
+				")",
+				"#",
+				">",
+				"+",
+				"-",
+				".",
+				"!"
+		};
+
+		for (String character: markdownSpecialChars) {
+			returnStr = returnStr.replace(character, '\\' + character);
+		}
+		return returnStr;
+	}
+}
 
 public class Source extends JavaPlugin implements Listener {
 
@@ -44,39 +92,12 @@ public class Source extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 	}
 
-	private String readyText(String str) {
-		String returnStr = str;
-		String[] markdownSpecialChars = new String[] {
-				//"\\"
-				"`",
-				"*",
-				"_",
-				"{",
-				"}",
-				"[",
-				"]",
-				"(",
-				")",
-				"#",
-				">",
-				"+",
-				"-",
-				".",
-				"!"
-		};
-
-		for (String character: markdownSpecialChars) {
-			returnStr.replace(character, "\\" + character);
-		}
-		return returnStr;
-	}
 
 	/*
 	* TODO
 	*
 	* - format messages escaping markdown with java
 	* - add advancement announcement https://jd.bukkit.org/org/bukkit/event/player/PlayerAchievementAwardedEvent.html
-	* - escaper doesnt work with backslash
 	*
 	* */
 
@@ -104,15 +125,14 @@ public class Source extends JavaPlugin implements Listener {
 
 				// we trim off the minecraft color formatting for this event
 				String originalMessage = event.getJoinMessage().substring(2);
-				// escapes any special markdown characters
-				String eventString = readyText(originalMessage);
+				// setup object
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage );
+				// get string from payload
+				ObjectMapper myObjectMapper = new ObjectMapper();
+				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
 
 				try (OutputStream outputStream = connection.getOutputStream()) {
-					byte[] input = (
-							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + ":green_circle: _" + eventString + "_" +
-									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
-					).getBytes(charset);
+					byte[] input = (stringPayload).getBytes(charset);
 					outputStream.write(input, 0, input.length);
 				}
 
@@ -156,15 +176,14 @@ public class Source extends JavaPlugin implements Listener {
 
 				// we trim off the minecraft color formatting for this event
 				String originalMessage = event.getQuitMessage().substring(2);
-				// escapes any special markdown characters
-				String eventString = readyText(originalMessage);
+				// setup object
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage );
+				// get string from payload
+				ObjectMapper myObjectMapper = new ObjectMapper();
+				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
 
 				try (OutputStream outputStream = connection.getOutputStream()) {
-					byte[] input = (
-							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + ":red_circle: _" + eventString + "_" +
-									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
-					).getBytes(charset);
+					byte[] input = (stringPayload).getBytes(charset);
 					outputStream.write(input, 0, input.length);
 				}
 
@@ -208,14 +227,14 @@ public class Source extends JavaPlugin implements Listener {
 
 				// escapes any special markdown characters
 				String originalMessage = event.getDeathMessage();
-				String eventString = readyText(originalMessage);
+				// setup object
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), originalMessage );
+				// get string from payload
+				ObjectMapper myObjectMapper = new ObjectMapper();
+				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
 
 				try (OutputStream outputStream = connection.getOutputStream()) {
-					byte[] input = (
-							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + ":skull_crossbones: _" + eventString + "_" +
-									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
-					).getBytes(charset);
+					byte[] input = (stringPayload).getBytes(charset);
 					outputStream.write(input, 0, input.length);
 				}
 
@@ -257,16 +276,14 @@ public class Source extends JavaPlugin implements Listener {
 
 				Charset charset = StandardCharsets.UTF_8;
 
-				// escapes any special markdown characters
-				String originalMessage = event.getMessage();
-				String eventString = readyText(originalMessage);
+				// setup object
+				WebHookPayload myPayload = new WebHookPayload( player.getName(), player.getUniqueId().toString(), event.getMessage() );
+				// get string from payload
+				ObjectMapper myObjectMapper = new ObjectMapper();
+				String stringPayload = myObjectMapper.writeValueAsString(myPayload);
 
 				try (OutputStream outputStream = connection.getOutputStream()) {
-					byte[] input = (
-							"{\"username\":\"" + player.getName() +
-									"\",\"content\":\"" + eventString +
-									"\",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay\"}"
-					).getBytes(charset);
+					byte[] input = (stringPayload).getBytes(charset);
 					outputStream.write(input, 0, input.length);
 				}
 
