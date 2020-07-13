@@ -21,5 +21,10 @@
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="jackson-repo" />
+      <option name="name" value="jackson-repo" />
+      <option name="url" value="https://mvnrepository.com/artifact/com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider" />
+    </remote-repository>
   </component>
 </project>
